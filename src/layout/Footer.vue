@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <div class="wrapper">
-      Best portal © 2017 - {{ currentYear }}
+      QuantumSolace © 2020 - {{ currentYear }}
     </div>
   </div>
 </template>
