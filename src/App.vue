@@ -39,8 +39,15 @@
           justify="center"
         >
           <v-col class="">
-            <draggable class="list-group" :list="list1" group="people" @change="log">
-              <Register  v-for="(element, index) in list2" :key="element.name" :index="index"></Register>
+            <draggable
+              v-for="(elem, index) in list1"
+              v-model="list1[index]"
+              :key="`register-${index}`"
+              class="register"
+              group="people"
+              @change="log"
+            >
+               <Gate v-for="element in list1[index]" :key="element.id" :name="element.name"></Gate>
             </draggable>
           </v-col>
         </v-row>
@@ -49,8 +56,13 @@
           justify="center"
         >
           <v-col>
-            <draggable class="list-group" :list="list1" group="people" @change="log">
-              <Gate v-for="index in 2"  v-for="(element) in list2" :key="element.name" name="H"></Gate>
+            <draggable
+              class="gates-list"
+              v-model="list2"
+              group="people"
+              @change="log"
+            >
+              <Gate v-for="(element) in list2" :key="element.id" :name="element.name"/>
             </draggable>
           </v-col>
         </v-row>
@@ -64,13 +76,12 @@
 </template>
 
 <script>
-  import Register from '@/components/Register';
   import Gate from '@/components/Gate';
-  import draggable from "@/vuedraggable";
+  import draggable from 'vuedraggable';
 
   export default {
     components: {
-      Register,
+      draggable,
       Gate
     },
     props: {
@@ -78,15 +89,14 @@
     },
     data: () => ({
       list1: [
-        { name: "John", id: 1 },
-        { name: "Joao", id: 2 },
-        { name: "Jean", id: 3 },
-        { name: "Gerard", id: 4 }
+        [],
+        [],
+        [],
       ],
       list2: [
-        { name: "Juan", id: 5 },
-        { name: "Edgard", id: 6 },
-        { name: "Johnson", id: 7 }
+        { name: "H", id: 0 },
+        { name: "H", id: 1 },
+        { name: "X", id: 2 }
       ],
       drawer: null,
     }),
@@ -102,4 +112,17 @@
 </script>
 
 <style lang="scss" scoped>
+  .register {
+    height: 1px;
+    border-bottom: red solid 1px;
+    padding-bottom: 20px;
+    display: inline-block;
+    width: 70%;
+    margin: 22px 0px 0px 0px;
+  }
+  .gates-list {
+    height: 42px;
+    width: 70%;
+    background: #464646;
+  }
 </style>
