@@ -1,25 +1,48 @@
 <template>
   <div class="register">
-    <span>c{{index}}</span>
-    <div class="line"></div>
+    c{{registerIndex}}
+    <draggable
+      v-model="gatesList"
+      :key="`register-${registerIndex}`"
+      class="draggable"
+      group="people"
+      @change="update"
+    >
+        <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
+    </draggable>
   </div>
 </template>
 
 <script>
+import draggable from 'vuedraggable'
+import Gate from '@/components/Gate'
+
 export default {
   name: 'Register',
+  data: () => ({
+    gatesList: []
+  }),
+  components: {
+    draggable,
+    Gate
+  },
   props: {
-    index: Number
+    registerIndex: Number
+  },
+  methods: {
+    update: function() {
+      this.$emit('on-update-register', this.registerIndex, this.gatesList);
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
-  .line {
+  .draggable {
     height: 1px;
-    width: 75%;
+    border-bottom: red solid 1px;
+    padding-bottom: 20px;
     display: inline-block;
-    background: var(--v-primary-base);
-    margin-bottom: 4px;
-    margin-left: 10px;
+    width: 70%;
+    margin: 22px 0px 0px 0px;
   }
 </style>

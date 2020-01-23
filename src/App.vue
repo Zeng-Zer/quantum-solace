@@ -39,16 +39,13 @@
           justify="center"
         >
           <v-col class="">
-            <draggable
-              v-for="(elem, index) in list1"
-              v-model="list1[index]"
+            <Register
+              v-for="(index) in registersList.length"
               :key="`register-${index}`"
-              class="register"
-              group="people"
-              @change="log"
+              :registerIndex="index - 1"
+              @on-update-register="updateRegister"
             >
-               <Gate v-for="element in list1[index]" :key="element.id" :name="element.name"></Gate>
-            </draggable>
+            </Register>
           </v-col>
         </v-row>
         <v-row
@@ -58,11 +55,10 @@
           <v-col>
             <draggable
               class="gates-list"
-              v-model="list2"
+              v-model="gatesList"
               group="people"
-              @change="log"
             >
-              <Gate v-for="(element) in list2" :key="element.id" :name="element.name"/>
+              <Gate v-for="(element) in gatesList" :key="element.id" :name="element.name"/>
             </draggable>
           </v-col>
         </v-row>
@@ -76,50 +72,42 @@
 </template>
 
 <script>
+  import Register from '@/components/Register';
   import Gate from '@/components/Gate';
   import draggable from 'vuedraggable';
 
   export default {
     components: {
       draggable,
-      Gate
+      Gate,
+      Register
     },
     props: {
       source: String,
     },
-    data: () => ({
-      list1: [
-        [],
-        [],
-        [],
-      ],
-      list2: [
-        { name: "H", id: 0 },
-        { name: "H", id: 1 },
-        { name: "X", id: 2 }
-      ],
-      drawer: null,
-    }),
+    data: () => {
+      return {
+        registersList: Array(2).fill([]),
+        gatesList: [
+          { name: "H", id: 0 },
+          { name: "H", id: 1 },
+          { name: "X", id: 2 }
+        ],
+        drawer: false,
+      }
+    },
     created () {
       this.$vuetify.theme.dark = true
     },
     methods: {
-      log: function(evt) {
-        console.log(evt);
+      updateRegister: function(registerIndex, gatesList) {
+        this.registersList[registerIndex] = gatesList;
       }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .register {
-    height: 1px;
-    border-bottom: red solid 1px;
-    padding-bottom: 20px;
-    display: inline-block;
-    width: 70%;
-    margin: 22px 0px 0px 0px;
-  }
   .gates-list {
     height: 42px;
     width: 70%;
