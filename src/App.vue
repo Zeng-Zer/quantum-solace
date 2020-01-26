@@ -22,7 +22,11 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>QuantumSolace</v-toolbar-title>
     </v-app-bar>
-    <router-view />
+    <v-content>
+      <v-container class="fill-height" fluid>
+        <router-view />
+      </v-container>
+    </v-content>
     <v-footer app>
       <span
         >QuantumSolace &copy; 2019 - Made with <v-icon>mdi-heart</v-icon> by

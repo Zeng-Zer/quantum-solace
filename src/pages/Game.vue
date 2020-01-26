@@ -1,30 +1,28 @@
 <template>
-  <v-content>
-    <v-container class="fill-height" fluid>
-      <v-row align="center" justify="center">
-        <v-col class="">
-          <Register
-            v-for="index in registersList.length"
-            :key="`register-${index}`"
-            :registerIndex="index - 1"
-            @on-update-register="updateRegister"
-          >
-          </Register>
-        </v-col>
-      </v-row>
-      <v-row align="center" justify="center">
-        <v-col>
-          <draggable class="gates-list" v-model="gatesList" group="people">
-            <Gate
-              v-for="element in gatesList"
-              :key="element.id"
-              :name="element.name"
-            />
-          </draggable>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-content>
+  <div>
+    <v-row align="center" justify="center">
+      <v-col class="">
+        <Register
+          v-for="index in registersList.length"
+          :key="`register-${index}`"
+          :registerIndex="index - 1"
+          @on-update-register="updateRegister"
+        >
+        </Register>
+      </v-col>
+    </v-row>
+    <v-row align="center" justify="center">
+      <v-col>
+        <draggable class="gates-list" v-model="gatesList" group="people">
+          <Gate
+            v-for="element in gatesList"
+            :key="element.id"
+            :name="element.name"
+          />
+        </draggable>
+      </v-col>
+    </v-row>
+  </div>
 </template>
 
 <script>
