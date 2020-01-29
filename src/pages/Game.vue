@@ -1,28 +1,31 @@
 <template>
-  <div>
+  <v-container class="fill-height" fluid>
     <v-row align="center" justify="center">
-      <v-col class="">
+      <v-col class="col-md-12">
         <Register
           v-for="index in registersList.length"
           :key="`register-${index}`"
           :registerIndex="index - 1"
+          :resetRegister="resetRegister"
           @on-update-register="updateRegister"
-        >
-        </Register>
+          @on-reset-received="resetRegister = false"
+        ></Register>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12">
+        <v-btn class="col-md-1" dark @click="reset">Reset</v-btn>
+        <v-btn class="col-md-2" color="accent" dark>Submit</v-btn>
       </v-col>
     </v-row>
     <v-row align="center" justify="center">
-      <v-col>
+      <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate
-            v-for="element in gatesList"
-            :key="element.id"
-            :name="element.name"
-          />
+          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
         </draggable>
       </v-col>
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -41,6 +44,7 @@ export default {
   },
   data: () => {
     return {
+      resetRegister: false,
       registersList: Array(2).fill([]),
       gatesList: [
         { name: "H", id: 0 },
@@ -55,6 +59,14 @@ export default {
   methods: {
     updateRegister: function(registerIndex, gatesList) {
       this.registersList[registerIndex] = gatesList;
+    },
+    reset: function() {
+      this.resetRegister = true;
+      this.gatesList = [
+        { name: "H", id: 0 },
+        { name: "H", id: 1 },
+        { name: "X", id: 2 }
+      ];
     }
   }
 };
@@ -63,7 +75,6 @@ export default {
 <style lang="scss" scoped>
 .gates-list {
   height: 42px;
-  width: 70%;
   background: #464646;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="register">
-    c{{registerIndex}}
+    <span>c{{registerIndex}}</span>
     <draggable
       v-model="gatesList"
       :key="`register-${registerIndex}`"
@@ -8,17 +8,17 @@
       group="people"
       @change="update"
     >
-        <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
+      <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
     </draggable>
   </div>
 </template>
 
 <script>
-import draggable from 'vuedraggable'
-import Gate from '@/components/Gate'
+import draggable from "vuedraggable";
+import Gate from "@/components/Gate";
 
 export default {
-  name: 'Register',
+  name: "Register",
   data: () => ({
     gatesList: []
   }),
@@ -27,22 +27,34 @@ export default {
     Gate
   },
   props: {
+    resetRegister: Boolean,
     registerIndex: Number
   },
   methods: {
     update: function() {
-      this.$emit('on-update-register', this.registerIndex, this.gatesList);
+      this.$emit("on-update-register", this.registerIndex, this.gatesList);
+    }
+  },
+  watch: {
+    resetRegister: function(newReset) {
+      if (newReset === true) {
+        this.gatesList = [];
+      }
+      this.$emit("on-reset-received");
     }
   }
-}
+};
 </script>
 <style lang="scss" scoped>
-  .draggable {
-    height: 1px;
-    border-bottom: red solid 1px;
-    padding-bottom: 20px;
-    display: inline-block;
-    width: 70%;
-    margin: 22px 0px 0px 0px;
-  }
+.register span {
+  display: inline-block;
+}
+.draggable {
+  height: 1px;
+  border-bottom: red solid 1px;
+  padding-bottom: 20px;
+  display: inline-block;
+  width: 97%;
+  margin: 22px 0px 0px 10px;
+}
 </style>
