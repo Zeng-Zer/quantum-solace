@@ -3,7 +3,7 @@
 ```
 {
     level: 2,
-    circuit: [
+    registers: [
         [
             {
                 name: 'H',
@@ -19,7 +19,7 @@
 ```
 {
     level: 3,
-    circuit: [
+    registers: [
         [
             {
                 name: 'H',
@@ -46,7 +46,7 @@
 ```
 {
     level: 4,
-    circuit: [
+    registers: [
         [
             {
                 name: 'H',
@@ -83,7 +83,7 @@
 ```
 {
     level: 5,
-    circuit: [
+    registers: [
         [
             {
                 name: 'barrier',
