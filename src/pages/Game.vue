@@ -21,7 +21,11 @@
     <v-row align="center" justify="center">
       <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
+          <Gate
+            v-for="element in gatesList"
+            :key="element.id"
+            :name="element.name"
+          />
         </draggable>
       </v-col>
     </v-row>
@@ -32,6 +36,7 @@
 import Register from "@/components/Register";
 import Gate from "@/components/Gate";
 import draggable from "vuedraggable";
+import _ from "lodash";
 
 export default {
   components: {
@@ -47,25 +52,45 @@ export default {
       resetRegister: false,
       registersList: Array(2).fill([]),
       gatesList: [
-        { name: "H", id: 0 },
-        { name: "H", id: 1 },
-        { name: "X", id: 2 }
+        { name: "B", id: 0 },
+        { name: "B", id: 1 },
+        { name: "H", id: 2 },
+        { name: "X", id: 3 }
       ]
     };
-  },
-  created() {
-    this.$vuetify.theme.dark = true;
   },
   methods: {
     updateRegister: function(registerIndex, gatesList) {
       this.registersList[registerIndex] = gatesList;
+      this.registersList.forEach(register => {
+        const newRegister = _.remove(register, el => el.name === null);
+        register = newRegister;
+      });
+      console.log(this.registersList);
+      const maxLength = _.max(
+        this.registersList.map(register => register.length)
+      );
+      this.registersList.forEach(register => {
+        if (register.length >= maxLength) {
+          return;
+        }
+        for (let i = 0; i <= maxLength - register.length; i++) {
+          register.push({
+            name: null,
+            id: Math.floor(Math.random() * 50000 + 1)
+          });
+        }
+      });
+
+      console.log(this.registersList);
     },
     reset: function() {
       this.resetRegister = true;
       this.gatesList = [
-        { name: "H", id: 0 },
-        { name: "H", id: 1 },
-        { name: "X", id: 2 }
+        { name: "B", id: 0 },
+        { name: "B", id: 1 },
+        { name: "H", id: 2 },
+        { name: "X", id: 3 }
       ];
     }
   }

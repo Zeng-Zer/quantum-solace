@@ -1,5 +1,7 @@
 # Generate a random number
+
 ## One qbit circuit
+
 ```
 {
     level: 2,
@@ -15,7 +17,9 @@
 ```
 
 # Entangle state
+
 ## Two qbits circuit
+
 ```
 {
     level: 3,
@@ -42,7 +46,9 @@
 ```
 
 # GHZ state (Greenberger–Horne–Zeilinger state)
+
 ## Three qbits circuit
+
 ```
 {
     level: 4,
@@ -78,6 +84,7 @@
 ```
 
 # Superdense coding
+
 ## Two qbits circuit
 
 ```
@@ -131,6 +138,7 @@
                 name: 'barrier',
                 option: null
             },
+            null,
             {
                 name: 'CX',
                 option: 'target'
@@ -139,6 +147,8 @@
                 name: 'barrier',
                 option: null
             },
+            null,
+            null,
             {
                 name: 'barrier',
                 option: null
@@ -147,6 +157,7 @@
                 name: 'CX',
                 option: 'target'
             },
+            null,
             {
                 name: 'barrier',
                 option: null

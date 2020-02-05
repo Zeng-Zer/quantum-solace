@@ -1,6 +1,6 @@
 <template>
   <div class="register">
-    <span>c{{registerIndex}}</span>
+    <span>q[{{ registerIndex }}]</span>
     <draggable
       v-model="gatesList"
       :key="`register-${registerIndex}`"
@@ -8,7 +8,11 @@
       group="people"
       @change="update"
     >
-      <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
+      <Gate
+        v-for="element in gatesList"
+        :key="element.id"
+        :name="element.name"
+      ></Gate>
     </draggable>
   </div>
 </template>
@@ -16,6 +20,7 @@
 <script>
 import draggable from "vuedraggable";
 import Gate from "@/components/Gate";
+// import _ from "lodash";
 
 export default {
   name: "Register",
@@ -54,7 +59,7 @@ export default {
   border-bottom: red solid 1px;
   padding-bottom: 20px;
   display: inline-block;
-  width: 97%;
+  width: 95%;
   margin: 22px 0px 0px 10px;
 }
 </style>
