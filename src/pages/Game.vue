@@ -6,9 +6,9 @@
           v-for="index in registersList.length"
           :key="`register-${index}`"
           :registerIndex="index - 1"
-          :resetRegister="resetRegister"
+          :resetRegister="resetRegister.bool"
           @on-update-register="updateRegister"
-          @on-reset-received="resetRegister = false"
+          @on-reset-received="resetResetRegister"
         ></Register>
       </v-col>
     </v-row>
@@ -21,11 +21,7 @@
     <v-row align="center" justify="center">
       <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate
-            v-for="element in gatesList"
-            :key="element.id"
-            :name="element.name"
-          />
+          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
         </draggable>
       </v-col>
     </v-row>
@@ -49,8 +45,14 @@ export default {
   },
   data: () => {
     return {
-      resetRegister: false,
-      registersList: Array(2).fill([]),
+      resetRegister: {
+        bool: false,
+        count: 0
+      },
+      yolo: {
+        name: "hey"
+      },
+      registersList: Array(3).fill([]),
       gatesList: [
         { name: "B", id: 0 },
         { name: "B", id: 1 },
@@ -60,13 +62,10 @@ export default {
     };
   },
   methods: {
-    updateRegister: function(registerIndex, gatesList) {
-      this.registersList[registerIndex] = gatesList;
+    uniformize: function() {
       this.registersList.forEach(register => {
-        const newRegister = _.remove(register, el => el.name === null);
-        register = newRegister;
+        _.remove(register, el => el.name === null);
       });
-      console.log(this.registersList);
       const maxLength = _.max(
         this.registersList.map(register => register.length)
       );
@@ -81,17 +80,31 @@ export default {
           });
         }
       });
-
-      console.log(this.registersList);
+    },
+    updateRegister: function(registerIndex, gatesList) {
+      this.registersList[registerIndex] = gatesList;
+      this.uniformize();
+    },
+    resetResetRegister: function(registerIndex) {
+      this.resetRegister.count += registerIndex;
+      let objective = 0;
+      for (let i = 0; i < this.registersList.length; i++) {
+        objective += i;
+      }
+      if (this.resetRegister.count === objective) {
+        this.resetRegister.bool = false;
+        this.resetRegister.count = 0;
+      }
     },
     reset: function() {
-      this.resetRegister = true;
+      this.resetRegister.bool = true;
       this.gatesList = [
         { name: "B", id: 0 },
         { name: "B", id: 1 },
         { name: "H", id: 2 },
         { name: "X", id: 3 }
       ];
+      this.registersList = Array(3).fill([]);
     }
   }
 };

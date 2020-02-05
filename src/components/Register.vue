@@ -8,11 +8,7 @@
       group="people"
       @change="update"
     >
-      <Gate
-        v-for="element in gatesList"
-        :key="element.id"
-        :name="element.name"
-      ></Gate>
+      <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
     </draggable>
   </div>
 </template>
@@ -45,7 +41,7 @@ export default {
       if (newReset === true) {
         this.gatesList = [];
       }
-      this.$emit("on-reset-received");
+      this.$emit("on-reset-received", this.registerIndex);
     }
   }
 };
