@@ -20,4 +20,12 @@ export default class Api {
       this.config
     );
   }
+
+  checkCircuit(circuitToCheck) {
+    return axios.post(
+      `${this.apiUrl}/checkCircuit`,
+      circuitToCheck,
+      this.config
+    );
+  }
 }

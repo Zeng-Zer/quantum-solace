@@ -34,26 +34,39 @@
         </draggable>
       </v-col>
     </v-row>
-    <v-dialog v-model="dialog" width="500">
-      <template v-slot:activator="{ on }">
-        <v-btn color="red lighten-2" dark v-on="on">
-          Click Me
-        </v-btn>
-      </template>
-
+    <v-dialog v-model="dialog" persistent width="800" height="800">
       <v-card>
-        <v-card-title class="headline grey lighten-2" primary-title>
-          Privacy Policy
+        <v-card-title class="headline dark" primary-title>
+          Results for the level {{ level }}
         </v-card-title>
 
         <v-card-text>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
+          <p>For {{ results.total }} run, you get those results:</p>
+          <img :src="`data:image/jpeg;base64, ${results.img}`" />
+          <br />
+          <br />
+          <v-chip
+            v-show="levelPassed"
+            class="ma-2"
+            color="green"
+            text-color="white"
+          >
+            <v-avatar left>
+              <v-icon>mdi-cake-variant</v-icon>
+            </v-avatar>
+            Well done! Level passed with success!
+          </v-chip>
+          <v-chip
+            v-show="!levelPassed"
+            class="ma-2"
+            color="red"
+            text-color="white"
+          >
+            <v-avatar left>
+              <v-icon>mdi-close</v-icon>
+            </v-avatar>
+            You failed! :( Try again
+          </v-chip>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -61,7 +74,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="dialog = false">
-            I accept
+            I'm done with those results
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -92,10 +105,15 @@ export default {
         name: "",
         id: -1
       },
+      levelPassed: false,
       dialog: false,
       resetRegister: {
         bool: false,
         count: 0
+      },
+      results: {
+        img: null,
+        count: null
       },
       level: 0,
       registerNumber: 0,
@@ -219,7 +237,20 @@ export default {
       api
         .runOnQiskit({ level: this.level, registers: registersListToSend })
         .then(res => {
-          console.log(res);
+          this.results.img = res.data.img;
+          this.results.count = res.data.count;
+          this.results.total = 0;
+          Object.keys(this.results.count).forEach(key => {
+            this.results.total += this.results.count[key];
+          });
+          api
+            .checkCircuit({ level: this.level, registers: registersListToSend })
+            .then(res => {
+              if (res.data === "SUCCESS") {
+                this.levelPassed = true;
+              }
+            });
+          this.dialog = true;
         });
     }
   }
