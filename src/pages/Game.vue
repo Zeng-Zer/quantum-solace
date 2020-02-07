@@ -18,7 +18,9 @@
     <v-row>
       <v-col cols="12">
         <v-btn class="col-md-1" dark @click="reset">Reset</v-btn>
-        <v-btn class="col-md-2" color="accent" dark>Submit</v-btn>
+        <v-btn class="col-md-2" color="accent" dark @click="submit"
+          >Submit</v-btn
+        >
       </v-col>
     </v-row>
     <v-row align="center" justify="center">
@@ -32,6 +34,38 @@
         </draggable>
       </v-col>
     </v-row>
+    <v-dialog v-model="dialog" width="500">
+      <template v-slot:activator="{ on }">
+        <v-btn color="red lighten-2" dark v-on="on">
+          Click Me
+        </v-btn>
+      </template>
+
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Privacy Policy
+        </v-card-title>
+
+        <v-card-text>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="dialog = false">
+            I accept
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -55,43 +89,56 @@ export default {
   data: () => {
     return {
       gateToAdd: {
-        name: "yolo",
+        name: "",
         id: -1
       },
+      dialog: false,
       resetRegister: {
         bool: false,
         count: 0
       },
-      yolo: {
-        name: "hey"
-      },
-      registersList: Array(3).fill([]),
-      gatesList: [
-        { name: "B", id: 0 },
-        { name: "B", id: 1 },
-        { name: "H", id: 2 },
-        { name: "X", id: 3 }
-      ]
+      level: 0,
+      registerNumber: 0,
+      registersList: null,
+      gatesList: []
     };
   },
   created: function() {
-    const api = new Api();
-    console.log(this.$route.params.level);
-    api.getCircuits();
+    this.level = parseInt(this.$route.params.level);
+    this.initLevel();
   },
   methods: {
+    initLevel: function() {
+      if (this.level === 1) {
+        this.registerNumber = 1;
+        this.registersList = Array(this.registerNumber).fill([]);
+        this.gatesList = [
+          { name: "H", id: 1 },
+          { name: "X", id: 2 },
+          { name: "Z", id: 3 }
+        ];
+      } else {
+        const api = new Api();
+        api.getCircuits().then(res => {
+          const circuits = res.data;
+          const goodCircuit = _.flatten(circuits[this.level - 2])[0].registers;
+          this.registerNumber = goodCircuit.length;
+          this.registersList = Array(this.registerNumber).fill([]);
+          let id = 0;
+          goodCircuit.forEach(gatesList => {
+            gatesList.gates.forEach(gate => {
+              if (gate.name && gate.option != "control")
+                this.gatesList.push({
+                  name: gate.name,
+                  id: id++
+                });
+            });
+          });
+          this.gatesList = _.shuffle(this.gatesList);
+        });
+      }
+    },
     uniformize: function() {
-      console.log("uni");
-      // this.registersList.some(register => {
-      //   _.reverse(register).some((el, index) => {
-      //     if (el.name !== null) {
-      //       return true;
-      //     }
-      //     delete register[index];
-      //     return false;
-      //   });
-      //   _.reverse(register);
-      // });
       const maxLength = _.max(
         this.registersList.map(register => register.length)
       );
@@ -100,7 +147,6 @@ export default {
           return;
         }
         for (let i = 0; i < maxLength - register.length; i++) {
-          console.log("add null game");
           register.push({
             name: null,
             id: getRandomId()
@@ -113,7 +159,7 @@ export default {
       indexAddedValue,
       originalRegisterIndex
     ) {
-      if (addedValue === "B") {
+      if (addedValue === "barrier") {
         this.gateToAdd = {
           originalRegisterIndex: originalRegisterIndex,
           index: indexAddedValue,
@@ -139,8 +185,7 @@ export default {
         registerIndex
       );
       this.registersList[registerIndex] = gatesList;
-      console.log(addedValue);
-      if (!justUpdate && addedValue !== "B") {
+      if (!justUpdate && addedValue !== "barrier") {
         this.uniformize();
       }
     },
@@ -157,13 +202,25 @@ export default {
     },
     reset: function() {
       this.resetRegister.bool = true;
-      this.gatesList = [
-        { name: "B", id: 0 },
-        { name: "B", id: 1 },
-        { name: "H", id: 2 },
-        { name: "X", id: 3 }
-      ];
-      this.registersList = Array(3).fill([]);
+      this.initLevel();
+    },
+    submit: function() {
+      const api = new Api();
+      let registersListToSend = [...this.registersList];
+      registersListToSend.forEach(register => {
+        register.forEach(gate => {
+          if (!gate.option) {
+            gate.option = null;
+          }
+          delete gate.id;
+        });
+      });
+      console.log(registersListToSend);
+      api
+        .runOnQiskit({ level: this.level, registers: registersListToSend })
+        .then(res => {
+          console.log(res);
+        });
     }
   }
 };

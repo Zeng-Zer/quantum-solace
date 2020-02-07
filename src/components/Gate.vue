@@ -1,7 +1,7 @@
 <template>
   <div
     class="gate"
-    :class="{ barrier: name === 'B', void: name === null }"
+    :class="{ barrier: name === 'barrier', void: name === null }"
     v-if="name !== undefined"
   >
     <div class="barrier-border" v-if="specialCase"></div>
@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     specialCase: function() {
-      if (this.name === "B") {
+      if (this.name === "barrier") {
         return true;
       }
       return false;

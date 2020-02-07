@@ -42,7 +42,6 @@ export default {
   },
   methods: {
     update: function(e, justUpdate = false) {
-      console.log(justUpdate);
       this.$emit(
         "on-update-register",
         this.registerIndex,
@@ -62,11 +61,8 @@ export default {
       deep: true,
       handler: function(newVal) {
         if (this.registerIndex !== newVal.originalRegisterIndex) {
-          console.log(newVal.index, this.gatesList.length);
           if (newVal.index > this.gatesList.length) {
             for (let i = 0; i <= newVal.index - this.gatesList.length; i++) {
-              console.log("y");
-              console.log("add null register");
               this.gatesList.push({
                 name: null,
                 id: getRandomId()

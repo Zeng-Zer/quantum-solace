@@ -10,8 +10,14 @@ export default class Api {
   }
 
   getCircuits() {
-    return axios
-      .get(`${this.apiUrl}/getCircuits`, this.config)
-      .then(res => console.log(res.data));
+    return axios.get(`${this.apiUrl}/getCircuits`, this.config);
+  }
+
+  runOnQiskit(circuitToCheck) {
+    return axios.post(
+      `${this.apiUrl}/runOnQiskit`,
+      circuitToCheck,
+      this.config
+    );
   }
 }
