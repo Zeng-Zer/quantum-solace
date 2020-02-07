@@ -8,7 +8,7 @@ import Menu from "@/pages/Menu";
 Vue.use(VueRouter);
 
 const routes = [
-  { path: "/game", component: Game },
+  { path: "/game/:level", component: Game },
   { path: "/onboarding", component: Onboarding },
   { path: "/menu", component: Menu }
 ];

@@ -6,9 +6,12 @@
           v-for="index in registersList.length"
           :key="`register-${index}`"
           :registerIndex="index - 1"
+          :registerNumber="registersList.length"
           :resetRegister="resetRegister.bool"
+          :gateToAdd="gateToAdd"
           @on-update-register="updateRegister"
           @on-reset-received="resetResetRegister"
+          @on-uniformize="uniformize"
         ></Register>
       </v-col>
     </v-row>
@@ -21,7 +24,11 @@
     <v-row align="center" justify="center">
       <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
+          <Gate
+            v-for="element in gatesList"
+            :key="element.id"
+            :name="element.name"
+          />
         </draggable>
       </v-col>
     </v-row>
@@ -32,6 +39,8 @@
 import Register from "@/components/Register";
 import Gate from "@/components/Gate";
 import draggable from "vuedraggable";
+import { getRandomId } from "@/services/utils.js";
+import Api from "@/services/api.js";
 import _ from "lodash";
 
 export default {
@@ -45,6 +54,10 @@ export default {
   },
   data: () => {
     return {
+      gateToAdd: {
+        name: "yolo",
+        id: -1
+      },
       resetRegister: {
         bool: false,
         count: 0
@@ -61,11 +74,24 @@ export default {
       ]
     };
   },
+  created: function() {
+    const api = new Api();
+    console.log(this.$route.params.level);
+    api.getCircuits();
+  },
   methods: {
     uniformize: function() {
-      this.registersList.forEach(register => {
-        _.remove(register, el => el.name === null);
-      });
+      console.log("uni");
+      // this.registersList.some(register => {
+      //   _.reverse(register).some((el, index) => {
+      //     if (el.name !== null) {
+      //       return true;
+      //     }
+      //     delete register[index];
+      //     return false;
+      //   });
+      //   _.reverse(register);
+      // });
       const maxLength = _.max(
         this.registersList.map(register => register.length)
       );
@@ -73,17 +99,50 @@ export default {
         if (register.length >= maxLength) {
           return;
         }
-        for (let i = 0; i <= maxLength - register.length; i++) {
+        for (let i = 0; i < maxLength - register.length; i++) {
+          console.log("add null game");
           register.push({
             name: null,
-            id: Math.floor(Math.random() * 50000 + 1)
+            id: getRandomId()
           });
         }
       });
     },
-    updateRegister: function(registerIndex, gatesList) {
+    handleMultipleRegistersGates: function(
+      addedValue,
+      indexAddedValue,
+      originalRegisterIndex
+    ) {
+      if (addedValue === "B") {
+        this.gateToAdd = {
+          originalRegisterIndex: originalRegisterIndex,
+          index: indexAddedValue,
+          name: addedValue,
+          id: getRandomId()
+        };
+      }
+    },
+    updateRegister: function(registerIndex, gatesList, justUpdate = false) {
+      let indexAddedValue = -1;
+      let addedValue = gatesList.filter((obj, i) => {
+        indexAddedValue = i;
+        return !this.registersList[registerIndex].some(
+          obj2 => obj.name == obj2.name && obj.id == obj2.id
+        );
+      })[0];
+      if (addedValue) {
+        addedValue = addedValue.name;
+      }
+      this.handleMultipleRegistersGates(
+        addedValue,
+        indexAddedValue,
+        registerIndex
+      );
       this.registersList[registerIndex] = gatesList;
-      this.uniformize();
+      console.log(addedValue);
+      if (!justUpdate && addedValue !== "B") {
+        this.uniformize();
+      }
     },
     resetResetRegister: function(registerIndex) {
       this.resetRegister.count += registerIndex;

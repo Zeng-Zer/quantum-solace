@@ -1,5 +1,9 @@
 <template>
-  <div class="gate" :class="{ barrier: name === 'B' }" v-if="name !== null">
+  <div
+    class="gate"
+    :class="{ barrier: name === 'B', void: name === null }"
+    v-if="name !== undefined"
+  >
     <div class="barrier-border" v-if="specialCase"></div>
     <span class="name" v-if="!specialCase">{{ name }}</span>
   </div>
@@ -50,5 +54,9 @@ export default {
 .register .barrier-border {
   height: 47px;
   margin: -15px;
+}
+
+.void {
+  background: transparent;
 }
 </style>
