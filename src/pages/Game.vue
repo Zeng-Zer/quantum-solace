@@ -4,7 +4,7 @@
       <v-icon left small>fa-arrow-left</v-icon>Go back to previous circuit
     </v-btn>
     <v-row align="center" justify="center">
-      <v-col class="col-md-12">
+      <v-col class="col-12">
         <Register
           v-for="index in registersList.length"
           :key="`register-${index}`"
@@ -31,7 +31,12 @@
     <v-row align="center" justify="center">
       <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
+          <Gate
+            v-for="element in gatesList"
+            :key="element.id"
+            :name="element.name"
+            :option="element.option"
+          />
         </draggable>
       </v-col>
     </v-row>
@@ -147,11 +152,13 @@ export default {
           let id = 0;
           goodCircuit.forEach(gatesList => {
             gatesList.gates.forEach(gate => {
-              if (gate.name && gate.option != "control")
+              if (gate.name && gate.option !== "control") {
                 this.gatesList.push({
                   name: gate.name,
+                  option: gate.option,
                   id: id++
                 });
+              }
             });
           });
           this.gatesList = _.shuffle(this.gatesList);
@@ -205,7 +212,7 @@ export default {
         registerIndex
       );
       this.registersList[registerIndex] = gatesList;
-      if (!justUpdate && addedValue !== "barrier") {
+      if (!justUpdate && addedValue !== "barrier" && addedValue !== "CX") {
         this.uniformize();
       }
     },

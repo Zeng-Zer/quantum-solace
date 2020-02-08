@@ -4,13 +4,15 @@
     :class="{
       barrier: name === 'barrier',
       cx: name === 'CX',
+      control: option === 'control',
+      target: option === 'target',
       void: name === null
     }"
     v-if="name !== undefined"
   >
-    <div class="barrier-border" v-if="specialCase"></div>
-    <v-icon v-if="name === 'CX'">mdi-close</v-icon>
-    <span class="name" v-if="!specialCase">{{ name }}</span>
+    <div class="barrier-border" v-show="name === 'barrier'"></div>
+    <v-icon v-show="name === 'CX' && option === 'target'">mdi-close</v-icon>
+    <span class="name" v-show="!specialCase">{{ name }}</span>
   </div>
 </template>
 
@@ -18,7 +20,8 @@
 export default {
   name: "Gate",
   props: {
-    name: String
+    name: String,
+    option: String
   },
   computed: {
     specialCase: function() {
@@ -49,7 +52,25 @@ export default {
 }
 
 .cx {
-  border-radius: 10px;
+  border-radius: 50%;
+}
+
+.cx.control {
+  width: 10px;
+  height: 10px;
+  margin-top: 0px;
+  margin-left: 16px;
+}
+
+.register .cx.target {
+}
+
+.cx.control::after {
+  content: "";
+  width: 1px;
+  position: absolute;
+  background: grey;
+  height: 55px;
 }
 
 .barrier .barrier-border {
@@ -66,6 +87,6 @@ export default {
 }
 
 .void {
-  background: transparent;
+  visibility: hidden;
 }
 </style>

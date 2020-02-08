@@ -13,7 +13,12 @@
       @change="update"
       @add="add"
     >
-      <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
+      <Gate
+        v-for="element in gatesList"
+        :key="element.id"
+        :name="element.name"
+        :option="element.option"
+      ></Gate>
     </draggable>
   </div>
 </template>
@@ -71,9 +76,9 @@ export default {
         ) {
           return;
         }
-        if (this.registerIndex !== newVal.originalRegisterIndex) {
+        if (this.registerIndex > newVal.originalRegisterIndex) {
           if (newVal.index > this.gatesList.length) {
-            for (let i = 0; i <= newVal.index - this.gatesList.length; i++) {
+            for (let i = 0; i < newVal.index - this.gatesList.length; i++) {
               this.gatesList.push({
                 name: null,
                 id: getRandomId()
@@ -102,7 +107,7 @@ span.initial-state {
 
 .draggable {
   height: 1px;
-  border-bottom: red solid 1px;
+  border-bottom: grey solid 1px;
   padding-bottom: 20px;
   display: inline-block;
   width: 92%;
