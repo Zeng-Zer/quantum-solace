@@ -18,54 +18,34 @@
     <v-row>
       <v-col cols="12">
         <v-btn class="col-md-1" dark @click="reset">Reset</v-btn>
-        <v-btn class="col-md-2" color="accent" dark @click="submit"
-          >Submit</v-btn
-        >
+        <v-btn class="col-md-2" color="accent" dark @click="submit">Submit</v-btn>
       </v-col>
     </v-row>
     <v-row align="center" justify="center">
       <v-col cols="12">
         <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate
-            v-for="element in gatesList"
-            :key="element.id"
-            :name="element.name"
-          />
+          <Gate v-for="element in gatesList" :key="element.id" :name="element.name" />
         </draggable>
       </v-col>
     </v-row>
     <v-dialog v-model="dialog" persistent width="800" height="800">
       <v-card>
-        <v-card-title class="headline dark" primary-title>
-          Results for the level {{ level }}
-        </v-card-title>
+        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
 
         <v-card-text>
           <p>For {{ results.total }} run, you get those results:</p>
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip
-            v-show="levelPassed"
-            class="ma-2"
-            color="green"
-            text-color="white"
-          >
+          <v-chip v-show="levelPassed" class="ma-2" color="green" text-color="white">
             <v-avatar left>
               <v-icon>mdi-cake-variant</v-icon>
-            </v-avatar>
-            Well done! Level passed with success!
+            </v-avatar>Well done! Level passed with success!
           </v-chip>
-          <v-chip
-            v-show="!levelPassed"
-            class="ma-2"
-            color="red"
-            text-color="white"
-          >
+          <v-chip v-show="!levelPassed" class="ma-2" color="red" text-color="white">
             <v-avatar left>
               <v-icon>mdi-close</v-icon>
-            </v-avatar>
-            You failed! :( Try again
+            </v-avatar>You failed! :( Try again
           </v-chip>
         </v-card-text>
 
@@ -73,9 +53,8 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false">
-            I'm done with those results
-          </v-btn>
+          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
+          <v-btn color="primary" text @click="nextLevel()">Go to next level</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -127,6 +106,7 @@ export default {
   },
   methods: {
     initLevel: function() {
+      this.gatesList = [];
       if (this.level === 1) {
         this.registerNumber = 1;
         this.registersList = Array(this.registerNumber).fill([]);
@@ -243,15 +223,29 @@ export default {
           Object.keys(this.results.count).forEach(key => {
             this.results.total += this.results.count[key];
           });
-          api
-            .checkCircuit({ level: this.level, registers: registersListToSend })
-            .then(res => {
-              if (res.data === "SUCCESS") {
-                this.levelPassed = true;
-              }
-            });
-          this.dialog = true;
+          if (this.level !== 1) {
+            api
+              .checkCircuit({
+                level: this.level,
+                registers: registersListToSend
+              })
+              .then(res => {
+                if (res.data === "SUCCESS") {
+                  this.levelPassed = true;
+                }
+                this.dialog = true;
+              });
+          } else {
+            this.levelPassed = true;
+            this.dialog = true;
+          }
         });
+    },
+    nextLevel: function() {
+      this.dialog = false;
+      this.$router.push({ path: `/game/${this.level + 1}` }); // -> /user/123
+      this.level = parseInt(this.$route.params.level);
+      this.reset();
     }
   }
 };
