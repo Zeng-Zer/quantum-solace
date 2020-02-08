@@ -36,7 +36,7 @@ export default {
   cursor: pointer;
   display: inline-block;
   margin: 5px;
-  background: var(--v-accent-base);
+  background: var(--v-primary-base);
   height: 32px;
   width: 32px;
   text-align: center;

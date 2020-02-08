@@ -1,5 +1,8 @@
 <template>
   <v-container class="fill-height" fluid>
+    <v-btn v-if="this.level !== 1" color="primary" dark @click="goBack">
+      <v-icon left small>fa-arrow-left</v-icon>Go back to previous circuit
+    </v-btn>
     <v-row align="center" justify="center">
       <v-col class="col-md-12">
         <Register
@@ -16,10 +19,14 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12">
-        <v-btn class="col-md-1" dark @click="reset">Reset</v-btn>
-        <v-btn class="col-md-2" color="accent" dark @click="submit">Submit</v-btn>
-      </v-col>
+      <v-card-actions>
+        <v-btn dark @click="reset">
+          <v-icon left small>fa-shower</v-icon>Clean circuit
+        </v-btn>
+        <v-btn color="primary" dark @click="submit">
+          <v-icon left small>fa-rocket</v-icon>Submit circuit
+        </v-btn>
+      </v-card-actions>
     </v-row>
     <v-row align="center" justify="center">
       <v-col cols="12">
@@ -29,7 +36,20 @@
       </v-col>
     </v-row>
     <v-dialog v-model="dialog" persistent width="800" height="800">
-      <v-card>
+      <v-sheet
+        v-show="loadingResults"
+        :color="`dark ${theme.isDark ? 'darken-2' : 'lighten-4'}`"
+        class="px-3 pt-3 pb-3"
+        height="800"
+        width="800"
+      >
+        <v-skeleton-loader type="heading"></v-skeleton-loader>
+        <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
+        <v-skeleton-loader width="480" min-height="480" type="image"></v-skeleton-loader>
+        <v-skeleton-loader type="chip"></v-skeleton-loader>
+        <v-skeleton-loader type="actions"></v-skeleton-loader>
+      </v-sheet>
+      <v-card v-show="!loadingResults">
         <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
 
         <v-card-text>
@@ -54,7 +74,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
-          <v-btn color="primary" text @click="nextLevel()">Go to next level</v-btn>
+          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -75,6 +95,7 @@ export default {
     Gate,
     Register
   },
+  inject: ["theme"],
   props: {
     source: String
   },
@@ -84,6 +105,7 @@ export default {
         name: "",
         id: -1
       },
+      loadingResults: true,
       levelPassed: false,
       dialog: false,
       resetRegister: {
@@ -203,6 +225,8 @@ export default {
       this.initLevel();
     },
     submit: function() {
+      this.dialog = true;
+      this.loadingResults = true;
       const api = new Api();
       let registersListToSend = [...this.registersList];
       registersListToSend.forEach(register => {
@@ -213,7 +237,6 @@ export default {
           delete gate.id;
         });
       });
-      console.log(registersListToSend);
       api
         .runOnQiskit({ level: this.level, registers: registersListToSend })
         .then(res => {
@@ -234,14 +257,21 @@ export default {
                   this.levelPassed = true;
                 }
                 this.dialog = true;
+                this.loadingResults = false;
               });
           } else {
             this.levelPassed = true;
-            this.dialog = true;
+            this.loadingResults = false;
           }
         });
     },
-    nextLevel: function() {
+    goBack: function() {
+      this.dialog = false;
+      this.$router.push({ path: `/game/${this.level - 1}` }); // -> /user/123
+      this.level = parseInt(this.$route.params.level);
+      this.reset();
+    },
+    goToNextLevel: function() {
       this.dialog = false;
       this.$router.push({ path: `/game/${this.level + 1}` }); // -> /user/123
       this.level = parseInt(this.$route.params.level);
@@ -251,9 +281,18 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style>
 .gates-list {
   height: 42px;
   background: #464646;
+}
+.v-skeleton-loader__image.v-skeleton-loader__bone {
+  height: 480px !important;
+}
+.v-skeleton-loader__chip.v-skeleton-loader__bone {
+  width: 293px;
+}
+.v-skeleton-loader {
+  margin: 26px 0px;
 }
 </style>
