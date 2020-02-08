@@ -1,21 +1,19 @@
 <template>
   <div class="register">
     <span>q[{{ registerIndex }}]</span>
-    <span class="initial-state"
-      >&nbsp;|<span v-for="i in registerNumber" :key="i">0</span>></span
-    >
+    <span class="initial-state">
+      &nbsp;|
+      <span v-for="i in registerNumber" :key="i">0</span>>
+    </span>
     <draggable
       v-model="gatesList"
       :key="`register-${registerIndex}`"
       class="draggable"
       group="people"
       @change="update"
+      @add="add"
     >
-      <Gate
-        v-for="element in gatesList"
-        :key="element.id"
-        :name="element.name"
-      ></Gate>
+      <Gate v-for="element in gatesList" :key="element.id" :name="element.name"></Gate>
     </draggable>
   </div>
 </template>
@@ -24,6 +22,7 @@
 import draggable from "vuedraggable";
 import Gate from "@/components/Gate";
 import { getRandomId } from "@/services/utils.js";
+import _ from "lodash";
 
 export default {
   name: "Register",
@@ -41,6 +40,12 @@ export default {
     gateToAdd: Object
   },
   methods: {
+    add: function() {
+      const lastElement = _.last(this.gatesList);
+      if (lastElement.name === "CX") {
+        lastElement.option = "control";
+      }
+    },
     update: function(e, justUpdate = false) {
       this.$emit(
         "on-update-register",
@@ -60,6 +65,12 @@ export default {
     gateToAdd: {
       deep: true,
       handler: function(newVal) {
+        if (
+          newVal.name === "CX" &&
+          this.registerIndex != newVal.originalRegisterIndex + 1
+        ) {
+          return;
+        }
         if (this.registerIndex !== newVal.originalRegisterIndex) {
           if (newVal.index > this.gatesList.length) {
             for (let i = 0; i <= newVal.index - this.gatesList.length; i++) {
@@ -71,6 +82,7 @@ export default {
           }
           this.gatesList.push({
             name: newVal.name,
+            option: newVal.name === "CX" ? "target" : null,
             id: getRandomId()
           });
         }

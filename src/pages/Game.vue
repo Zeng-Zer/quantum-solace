@@ -118,7 +118,7 @@ export default {
       },
       level: 0,
       registerNumber: 0,
-      registersList: null,
+      registersList: [],
       gatesList: []
     };
   },
@@ -179,7 +179,7 @@ export default {
       indexAddedValue,
       originalRegisterIndex
     ) {
-      if (addedValue === "barrier") {
+      if (addedValue === "barrier" || addedValue === "CX") {
         this.gateToAdd = {
           originalRegisterIndex: originalRegisterIndex,
           index: indexAddedValue,
