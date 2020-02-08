@@ -150,8 +150,11 @@ export default {
           this.registerNumber = goodCircuit.length;
           this.registersList = Array(this.registerNumber).fill([]);
           let id = 0;
-          goodCircuit.forEach(gatesList => {
+          goodCircuit.forEach((gatesList, i) => {
             gatesList.gates.forEach(gate => {
+              if (i !== 0 && gate.name === "barrier") {
+                return;
+              }
               if (gate.name && gate.option !== "control") {
                 this.gatesList.push({
                   name: gate.name,
