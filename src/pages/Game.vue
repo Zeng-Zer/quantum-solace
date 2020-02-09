@@ -49,8 +49,9 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
+        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader width="480" min-height="480" type="image"></v-skeleton-loader>
+        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
@@ -58,16 +59,19 @@
         <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
 
         <v-card-text>
+          <v-alert type="info">
+            <div v-html="results.explanation"></div>
+          </v-alert>
           <p>For {{ results.total }} run, you get those results:</p>
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip v-show="levelPassed" class="ma-2" color="green" text-color="white">
+          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
             <v-avatar left>
               <v-icon>mdi-cake-variant</v-icon>
             </v-avatar>Well done! Level passed with success!
           </v-chip>
-          <v-chip v-show="!levelPassed" class="ma-2" color="red" text-color="white">
+          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
             <v-avatar left>
               <v-icon>mdi-close</v-icon>
             </v-avatar>You failed! :( Try again
@@ -90,7 +94,7 @@
 import Register from "@/components/Register";
 import Gate from "@/components/Gate";
 import draggable from "vuedraggable";
-import { getRandomId } from "@/services/utils.js";
+import { getRandomId, getExplanationLevelOne } from "@/services/utils.js";
 import Api from "@/services/api.js";
 import _ from "lodash";
 
@@ -119,7 +123,8 @@ export default {
       },
       results: {
         img: null,
-        count: null
+        count: null,
+        explanation: ""
       },
       level: 0,
       registerNumber: 0,
@@ -133,6 +138,7 @@ export default {
   },
   methods: {
     initLevel: function() {
+      this.results.explanation = "";
       this.gatesList = [];
       if (this.level === 1) {
         this.registerNumber = 1;
@@ -256,22 +262,24 @@ export default {
           Object.keys(this.results.count).forEach(key => {
             this.results.total += this.results.count[key];
           });
-          if (this.level !== 1) {
+          if (this.level === 1) {
+            this.levelPassed = true;
+            this.loadingResults = false;
+            this.results.explanation = getExplanationLevelOne();
+          } else {
             api
               .checkCircuit({
                 level: this.level,
                 registers: registersListToSend
               })
               .then(res => {
-                if (res.data === "SUCCESS") {
+                if (res.data.code === "SUCCESS") {
                   this.levelPassed = true;
                 }
+                this.results.explanation = res.data.explanation;
                 this.dialog = true;
                 this.loadingResults = false;
               });
-          } else {
-            this.levelPassed = true;
-            this.loadingResults = false;
           }
         });
     },
@@ -296,13 +304,13 @@ export default {
   height: 42px;
   background: #464646;
 }
-.v-skeleton-loader__image.v-skeleton-loader__bone {
+.plot .v-skeleton-loader__image.v-skeleton-loader__bone {
   height: 480px !important;
 }
 .v-skeleton-loader__chip.v-skeleton-loader__bone {
   width: 293px;
 }
 .v-skeleton-loader {
-  margin: 26px 0px;
+  margin: 6px 0px;
 }
 </style>

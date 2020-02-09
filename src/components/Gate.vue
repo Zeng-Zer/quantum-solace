@@ -1,22 +1,30 @@
 <template>
-  <div
-    class="gate"
-    :class="{
+  <v-tooltip top>
+    <template v-slot:activator="{ on }">
+      <div
+        v-on="on"
+        class="gate"
+        :class="{
       barrier: name === 'barrier',
       cx: name === 'CX',
       control: option === 'control',
       target: option === 'target',
       void: name === null
     }"
-    v-if="name !== undefined"
-  >
-    <div class="barrier-border" v-show="name === 'barrier'"></div>
-    <v-icon v-show="name === 'CX' && option === 'target'">mdi-close</v-icon>
-    <span class="name" v-show="!specialCase">{{ name }}</span>
-  </div>
+        v-if="name !== undefined"
+      >
+        <div class="barrier-border" v-show="name === 'barrier'"></div>
+        <v-icon v-show="name === 'CX' && option === 'target'">mdi-close</v-icon>
+        <span class="name" v-show="!specialCase">{{ name }}</span>
+      </div>
+    </template>
+    <span v-html="description"></span>
+  </v-tooltip>
 </template>
 
 <script>
+import { getGateDescriptionByName } from "@/services/utils.js";
+
 export default {
   name: "Gate",
   props: {
@@ -24,6 +32,9 @@ export default {
     option: String
   },
   computed: {
+    description: function() {
+      return getGateDescriptionByName(this.name);
+    },
     specialCase: function() {
       if (this.name === "barrier" || this.name === "CX") {
         return true;
@@ -60,9 +71,6 @@ export default {
   height: 10px;
   margin-top: 0px;
   margin-left: 16px;
-}
-
-.register .cx.target {
 }
 
 .cx.control::after {
