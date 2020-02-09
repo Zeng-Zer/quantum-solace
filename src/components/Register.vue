@@ -50,6 +50,17 @@ export default {
       if (lastElement.name === "CX") {
         lastElement.option = "control";
       }
+      if (
+        this.registerIndex === this.registerNumber - 1 &&
+        (lastElement.name === "CX" || lastElement.name === "barrier")
+      ) {
+        this.gatesList.pop();
+        this.$emit(
+          "on-special-gate-refused",
+          lastElement.name,
+          lastElement.option
+        );
+      }
     },
     update: function(e, justUpdate = false) {
       this.$emit(

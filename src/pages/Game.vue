@@ -14,6 +14,7 @@
           :gateToAdd="gateToAdd"
           @on-update-register="updateRegister"
           @on-reset-received="resetResetRegister"
+          @on-special-gate-refused="addBackGate"
           @on-uniformize="uniformize"
         ></Register>
       </v-col>
@@ -30,6 +31,8 @@
     </v-row>
     <v-row align="center" justify="center">
       <v-col cols="12">
+        <h2>Gates you can use to build the circuit :</h2>
+        <p>(Drag and drop it on the registers above)</p>
         <draggable class="gates-list" v-model="gatesList" group="people">
           <Gate
             v-for="element in gatesList"
@@ -49,14 +52,25 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
-        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          width="680"
+          height="120"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          class="plot"
+          width="480"
+          min-height="480"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
       <v-card v-show="!loadingResults">
-        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
+        <v-card-title class="headline dark" primary-title
+          >Results for the level {{ level }}</v-card-title
+        >
 
         <v-card-text>
           <v-alert type="info">
@@ -66,15 +80,23 @@
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-cake-variant</v-icon>
-            </v-avatar>Well done! Level passed with success!
+          <v-chip
+            v-if="levelPassed && level != 1"
+            class="ma-2"
+            color="green"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-cake-variant</v-icon> </v-avatar>Well
+            done! Level passed with success!
           </v-chip>
-          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-close</v-icon>
-            </v-avatar>You failed! :( Try again
+          <v-chip
+            v-if="!levelPassed"
+            class="ma-2"
+            color="red"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-close</v-icon> </v-avatar>You failed! :(
+            Try again
           </v-chip>
         </v-card-text>
 
@@ -82,11 +104,25 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
-          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
+          <v-btn color="primary" text @click="dialog = false"
+            >Try out other circuits</v-btn
+          >
+          <v-btn
+            color="primary"
+            text
+            v-show="levelPassed"
+            @click="goToNextLevel()"
+            >Go to next level</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar color="error" v-model="snackbar">
+      You cannot put a multiple-registers gate on the last register
+      <v-btn color="dark" text @click="snackbar = false">
+        OK
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -114,6 +150,7 @@ export default {
         name: "",
         id: -1
       },
+      snackbar: false,
       loadingResults: true,
       levelPassed: false,
       dialog: false,
@@ -203,6 +240,14 @@ export default {
           id: getRandomId()
         };
       }
+    },
+    addBackGate: function(gateName) {
+      this.gatesList.push({
+        name: gateName,
+        option: gateName === "CX" ? "target" : null,
+        id: getRandomId()
+      });
+      this.snackbar = true;
     },
     updateRegister: function(registerIndex, gatesList, justUpdate = false) {
       let indexAddedValue = -1;
