@@ -8,12 +8,11 @@
             It's a pedagogy game where you have to build quantum circuits in
             order to reach a specific state.
             <br />
-            <br />The game is composed of multiple levels that evolve in difficulty. A
-            quantum circuit is composed of quantum register (qbit) and quantum
-            gates.
-            <br />In this game, every qbit start at the state |0>.
-            <br />With quantum gates you can transform the value of this state
-            and therefore make an algorithm.
+            <br />The game is composed of multiple levels that evolves in
+            difficulty. A quantum circuit is composed of quantum register (qbit)
+            and quantum gates. <br />In this game, every qbit start at the state
+            |0>. <br />With quantum gates you can transform the value of this
+            state and therefore make an algorithm.
           </p>
           <router-link to="/game/1">
             <v-btn x-large rounded color="primary" dark>Play the game</v-btn>

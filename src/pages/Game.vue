@@ -5,6 +5,11 @@
     </v-btn>
     <v-row align="center" justify="center">
       <v-col class="col-12">
+        <h2>Objective state:</h2>
+        <div>
+          <vue-mathjax v-if="level > 1" :formula="objectiveFormula" :options="mathjaxConfig"></vue-mathjax>
+          <div v-else>there is no objective, just play around!</div>
+        </div>
         <Register
           v-for="index in registersList.length"
           :key="`register-${index}`"
@@ -52,25 +57,14 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
-        <v-skeleton-loader
-          width="680"
-          height="120"
-          type="image"
-        ></v-skeleton-loader>
+        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader
-          class="plot"
-          width="480"
-          min-height="480"
-          type="image"
-        ></v-skeleton-loader>
+        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
       <v-card v-show="!loadingResults">
-        <v-card-title class="headline dark" primary-title
-          >Results for the level {{ level }}</v-card-title
-        >
+        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
 
         <v-card-text>
           <v-alert type="info">
@@ -80,22 +74,16 @@
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip
-            v-if="levelPassed && level != 1"
-            class="ma-2"
-            color="green"
-            text-color="white"
-          >
-            <v-avatar left> <v-icon>mdi-cake-variant</v-icon> </v-avatar>Well
+          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
+            <v-avatar left>
+              <v-icon>mdi-cake-variant</v-icon>
+            </v-avatar>Well
             done! Level passed with success!
           </v-chip>
-          <v-chip
-            v-if="!levelPassed"
-            class="ma-2"
-            color="red"
-            text-color="white"
-          >
-            <v-avatar left> <v-icon>mdi-close</v-icon> </v-avatar>You failed! :(
+          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
+            <v-avatar left>
+              <v-icon>mdi-close</v-icon>
+            </v-avatar>You failed! :(
             Try again
           </v-chip>
         </v-card-text>
@@ -104,24 +92,14 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false"
-            >Try out other circuits</v-btn
-          >
-          <v-btn
-            color="primary"
-            text
-            v-show="levelPassed"
-            @click="goToNextLevel()"
-            >Go to next level</v-btn
-          >
+          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
+          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-snackbar color="error" v-model="snackbar">
       You cannot put a multiple-registers gate on the last register
-      <v-btn color="dark" text @click="snackbar = false">
-        OK
-      </v-btn>
+      <v-btn color="dark" text @click="snackbar = false">OK</v-btn>
     </v-snackbar>
   </v-container>
 </template>
@@ -150,6 +128,13 @@ export default {
         name: "",
         id: -1
       },
+      mathjaxConfig: {
+        tex: {
+          autoload: {
+            ket: ["braket"]
+          }
+        }
+      },
       snackbar: false,
       loadingResults: true,
       levelPassed: false,
@@ -174,8 +159,11 @@ export default {
     this.initLevel();
   },
   methods: {
-    initLevel: function() {
-      this.results.explanation = "";
+    initLevel: function(soft = false) {
+      if (!soft) {
+        this.objectiveFormula = "";
+        this.results.explanation = "";
+      }
       this.gatesList = [];
       if (this.level === 1) {
         this.registerNumber = 1;
@@ -189,11 +177,12 @@ export default {
         const api = new Api();
         api.getCircuits().then(res => {
           const circuits = res.data;
-          const goodCircuit = _.flatten(circuits[this.level - 2])[0].registers;
-          this.registerNumber = goodCircuit.length;
+          const goodCircuit = _.flatten(circuits[this.level - 2])[0];
+          this.objectiveFormula = goodCircuit.formula;
+          this.registerNumber = goodCircuit.registers.length;
           this.registersList = Array(this.registerNumber).fill([]);
           let id = 0;
-          goodCircuit.forEach((gatesList, i) => {
+          goodCircuit.registers.forEach((gatesList, i) => {
             gatesList.gates.forEach(gate => {
               if (i !== 0 && gate.name === "barrier") {
                 return;
@@ -267,6 +256,7 @@ export default {
       );
       this.registersList[registerIndex] = gatesList;
       if (!justUpdate && addedValue !== "barrier" && addedValue !== "CX") {
+      if (!justUpdate && addedValue !== "barrier") {
         this.uniformize();
       }
     },
@@ -283,7 +273,7 @@ export default {
     },
     reset: function() {
       this.resetRegister.bool = true;
-      this.initLevel();
+      this.initLevel(true);
     },
     submit: function() {
       this.dialog = true;
@@ -335,6 +325,10 @@ export default {
       this.reset();
     },
     goToNextLevel: function() {
+      if (this.level + 1 === 6) {
+        this.$router.push({ path: `/end` });
+        return;
+      }
       this.dialog = false;
       this.$router.push({ path: `/game/${this.level + 1}` }); // -> /user/123
       this.level = parseInt(this.$route.params.level);

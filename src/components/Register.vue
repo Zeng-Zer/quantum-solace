@@ -1,10 +1,11 @@
 <template>
   <div class="register">
     <span>q[{{ registerIndex }}]</span>
-    <span class="initial-state">
-      &nbsp;|
-      <span v-for="i in registerNumber" :key="i">0</span>>
-    </span>
+    <vue-mathjax
+      class="initial-state"
+      :formula="`$$|${Array(registerNumber + 1).join('0')}\\rangle$$`"
+      :options="mathjaxConfig"
+    ></vue-mathjax>
     <draggable
       v-model="gatesList"
       :key="`register-${registerIndex}`"
@@ -32,7 +33,14 @@ import _ from "lodash";
 export default {
   name: "Register",
   data: () => ({
-    gatesList: []
+    gatesList: [],
+    mathjaxConfig: {
+      tex: {
+        autoload: {
+          ket: ["braket"]
+        }
+      }
+    }
   }),
   components: {
     draggable,
@@ -87,9 +95,16 @@ export default {
         ) {
           return;
         }
+        console.log(this.gatesList[newVal.index]);
+        if (
+          this.gatesList[newVal.index] &&
+          this.gatesList[newVal.index].name === null
+        ) {
+          this.gatesList.splice(newVal.index, 1);
+        }
         if (this.registerIndex > newVal.originalRegisterIndex) {
           if (newVal.index > this.gatesList.length) {
-            for (let i = 0; i < newVal.index - this.gatesList.length; i++) {
+            for (let i = 0; i <= newVal.index - this.gatesList.length; i++) {
               this.gatesList.push({
                 name: null,
                 id: getRandomId()
@@ -102,7 +117,11 @@ export default {
             id: getRandomId()
           });
         }
-        this.update(null, true);
+        let justUpdate = true;
+        if (newVal.option === "target") {
+          justUpdate = false;
+        }
+        this.update(null, justUpdate);
       }
     }
   }
@@ -111,6 +130,7 @@ export default {
 <style lang="scss" scoped>
 .register span {
   display: inline-block;
+  font-family: monospace;
 }
 span.initial-state {
   margin-left: 10px;

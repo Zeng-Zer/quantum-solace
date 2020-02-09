@@ -11,9 +11,11 @@
     }"
     v-if="name !== undefined"
   >
-    <div class="barrier-border" v-show="name === 'barrier'"></div>
-    <v-icon v-show="name === 'CX' && option === 'target'">mdi-close</v-icon>
-    <span class="name" v-show="!specialCase">{{ name }}</span>
+    <div class="d-inline-block">
+      <div class="barrier-border" v-show="name === 'barrier'"></div>
+      <v-icon v-show="name === 'CX' && option === 'target'">mdi-close</v-icon>
+      <span class="name" v-show="!specialCase">{{ name }}</span>
+    </div>
   </div>
 </template>
 
@@ -59,6 +61,10 @@ export default {
 
 .cx {
   border-radius: 50%;
+}
+
+.register .cx.target + .barrier {
+  width: 10px;
 }
 
 .cx.control {
