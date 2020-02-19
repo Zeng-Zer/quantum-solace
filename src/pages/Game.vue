@@ -77,14 +77,12 @@
           <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
             <v-avatar left>
               <v-icon>mdi-cake-variant</v-icon>
-            </v-avatar>Well
-            done! Level passed with success!
+            </v-avatar>Well done! Level passed with success!
           </v-chip>
           <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
             <v-avatar left>
               <v-icon>mdi-close</v-icon>
-            </v-avatar>You failed! :(
-            Try again
+            </v-avatar>You failed! :( Try again
           </v-chip>
         </v-card-text>
 
@@ -255,7 +253,6 @@ export default {
         registerIndex
       );
       this.registersList[registerIndex] = gatesList;
-      if (!justUpdate && addedValue !== "barrier" && addedValue !== "CX") {
       if (!justUpdate && addedValue !== "barrier") {
         this.uniformize();
       }
@@ -310,6 +307,8 @@ export default {
               .then(res => {
                 if (res.data.code === "SUCCESS") {
                   this.levelPassed = true;
+                } else {
+                  this.levelPassed = false;
                 }
                 this.results.explanation = res.data.explanation;
                 this.dialog = true;
