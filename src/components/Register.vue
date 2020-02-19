@@ -1,11 +1,7 @@
 <template>
   <div class="register">
     <span>q[{{ registerIndex }}]</span>
-    <vue-mathjax
-      class="initial-state"
-      :formula="`$$|${Array(registerNumber + 1).join('0')}\\rangle$$`"
-      :options="mathjaxConfig"
-    ></vue-mathjax>
+    <vue-mathjax class="initial-state" :formula="`$$|0\\rangle$$`" :options="mathjaxConfig"></vue-mathjax>
     <draggable
       v-model="gatesList"
       :key="`register-${registerIndex}`"
@@ -95,7 +91,6 @@ export default {
         ) {
           return;
         }
-        console.log(this.gatesList[newVal.index]);
         if (
           this.gatesList[newVal.index] &&
           this.gatesList[newVal.index].name === null
