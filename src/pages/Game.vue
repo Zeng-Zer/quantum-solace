@@ -5,47 +5,58 @@
     </v-btn>
     <v-row align="center" justify="center">
       <v-col class="col-12">
-        <h2>Objective state:</h2>
-        <div>
-          <vue-mathjax v-if="level > 1" :formula="objectiveFormula" :options="mathjaxConfig"></vue-mathjax>
-          <div v-else>there is no objective, just play around!</div>
+        <div id="objective">
+          <h2>Objective state:</h2>
+          <div>
+            <vue-mathjax
+              v-if="level > 1"
+              :formula="objectiveFormula"
+              :options="mathjaxConfig"
+            ></vue-mathjax>
+            <div v-else>there is no objective, just play around!</div>
+          </div>
         </div>
-        <Register
-          v-for="index in registersList.length"
-          :key="`register-${index}`"
-          :registerIndex="index - 1"
-          :registerNumber="registersList.length"
-          :resetRegister="resetRegister.bool"
-          :gateToAdd="gateToAdd"
-          @on-update-register="updateRegister"
-          @on-reset-received="resetResetRegister"
-          @on-special-gate-refused="addBackGate"
-          @on-uniformize="uniformize"
-        ></Register>
+        <div id="registers">
+          <Register
+            v-for="index in registersList.length"
+            :key="`register-${index}`"
+            :registerIndex="index - 1"
+            :registerNumber="registersList.length"
+            :resetRegister="resetRegister.bool"
+            :gateToAdd="gateToAdd"
+            @on-update-register="updateRegister"
+            @on-reset-received="resetResetRegister"
+            @on-special-gate-refused="addBackGate"
+            @on-uniformize="uniformize"
+          ></Register>
+        </div>
       </v-col>
     </v-row>
     <v-row>
       <v-card-actions>
-        <v-btn dark @click="reset">
+        <v-btn dark @click="reset" id="clean-circuit-btn">
           <v-icon left small>fa-shower</v-icon>Clean circuit
         </v-btn>
-        <v-btn color="primary" dark @click="submit">
+        <v-btn color="primary" dark @click="submit" id="submit-circuit-btn">
           <v-icon left small>fa-rocket</v-icon>Submit circuit
         </v-btn>
       </v-card-actions>
     </v-row>
     <v-row align="center" justify="center">
       <v-col cols="12">
-        <h2>Gates you can use to build the circuit :</h2>
-        <p>(Drag and drop it on the registers above)</p>
-        <draggable class="gates-list" v-model="gatesList" group="people">
-          <Gate
-            v-for="element in gatesList"
-            :key="element.id"
-            :name="element.name"
-            :option="element.option"
-          />
-        </draggable>
+        <div>
+          <h2>Gates you can use to build the circuit :</h2>
+          <p>(Drag and drop it on the registers above)</p>
+          <draggable class="gates-list" v-model="gatesList" group="people">
+            <Gate
+              class="gates"
+              v-for="element in gatesList"
+              :key="element.id"
+              :name="element.name"
+              :option="element.option"
+            />
+          </draggable>
+        </div>
       </v-col>
     </v-row>
     <v-dialog v-model="dialog" persistent width="800" height="800">
@@ -57,14 +68,25 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
-        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          width="680"
+          height="120"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          class="plot"
+          width="480"
+          min-height="480"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
       <v-card v-show="!loadingResults">
-        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
+        <v-card-title class="headline dark" primary-title
+          >Results for the level {{ level }}</v-card-title
+        >
 
         <v-card-text>
           <v-alert type="info">
@@ -74,15 +96,23 @@
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-cake-variant</v-icon>
-            </v-avatar>Well done! Level passed with success!
+          <v-chip
+            v-if="levelPassed && level != 1"
+            class="ma-2"
+            color="green"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-cake-variant</v-icon> </v-avatar>Well
+            done! Level passed with success!
           </v-chip>
-          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-close</v-icon>
-            </v-avatar>You failed! :( Try again
+          <v-chip
+            v-if="!levelPassed"
+            class="ma-2"
+            color="red"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-close</v-icon> </v-avatar>You failed! :(
+            Try again
           </v-chip>
         </v-card-text>
 
@@ -90,8 +120,16 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
-          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
+          <v-btn color="primary" text @click="dialog = false"
+            >Try out other circuits</v-btn
+          >
+          <v-btn
+            color="primary"
+            text
+            v-show="levelPassed"
+            @click="goToNextLevel()"
+            >Go to next level</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -99,6 +137,7 @@
       You cannot put a multiple-registers gate on the last register
       <v-btn color="dark" text @click="snackbar = false">OK</v-btn>
     </v-snackbar>
+    <v-tour name="myTour" :steps="steps"></v-tour>
   </v-container>
 </template>
 
@@ -122,6 +161,62 @@ export default {
   },
   data: () => {
     return {
+      steps: [
+        {
+          target: "header", // We're using document.querySelector() under the hood
+          header: {
+            title: "Get Started"
+          },
+          content: `Discover <strong>Vue Tour</strong>!`,
+          params: {
+            placement: "bottom",
+            highlight: false
+          }
+        },
+        {
+          target: "#objective", // We're using document.querySelector() under the hood
+          header: {
+            title: "Get Started"
+          },
+          content: `Discover <strong>Vue Tour</strong>!`,
+          params: {
+            placement: "right",
+            highlight: true
+          }
+        },
+        {
+          target: "#registers",
+          content: "An awesome plugin made with Vue.js!",
+          params: {
+            placement: "bottom",
+            highlight: true
+          }
+        },
+        {
+          target: "#clean-circuit-btn",
+          content: "An awesome plugin made with Vue.js!",
+          params: {
+            placement: "bottom",
+            highlight: true
+          }
+        },
+        {
+          target: "#submit-circuit-btn",
+          content: "An awesome plugin made with Vue.js!",
+          params: {
+            placement: "bottom",
+            highlight: true
+          }
+        },
+        {
+          target: ".gates-list",
+          content: "An awesome plugin made with Vue.js!",
+          params: {
+            placement: "bottom",
+            highlight: true
+          }
+        }
+      ],
       gateToAdd: {
         name: "",
         id: -1
@@ -152,7 +247,7 @@ export default {
       gatesList: []
     };
   },
-  created: function() {
+  mounted: function() {
     this.level = parseInt(this.$route.params.level);
     this.initLevel();
   },
@@ -164,6 +259,7 @@ export default {
       }
       this.gatesList = [];
       if (this.level === 1) {
+        this.$tours["myTour"].start();
         this.registerNumber = 1;
         this.registersList = Array(this.registerNumber).fill([]);
         this.gatesList = [
@@ -350,5 +446,15 @@ export default {
 }
 .v-skeleton-loader {
   margin: 6px 0px;
+}
+#objective {
+  width: 300px;
+  padding: 10px;
+}
+#registers {
+  padding: 10px;
+}
+.v-tour__target--highlighted {
+  box-shadow: 0 0 0 99999px rgba(255, 255, 255, 0.4) !important;
 }
 </style>
