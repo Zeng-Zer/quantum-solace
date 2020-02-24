@@ -16,7 +16,7 @@
             <br />With quantum gates you can transform the value of this
             state and therefore make an algorithm.
           </p>
-          <router-link to="/game/0">
+          <router-link to="/onboarding">
             <v-btn x-large rounded color="primary" dark>Play the game</v-btn>
           </router-link>
         </v-flex>

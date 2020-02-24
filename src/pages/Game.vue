@@ -5,14 +5,10 @@
     </v-btn>
     <v-row align="center" justify="center">
       <v-col class="col-12">
-        <div id="objective">
+        <div id="objective" :class="{'objective-level1': level == 1 }">
           <h2>Objective state:</h2>
           <div>
-            <vue-mathjax
-              v-if="level > 1"
-              :formula="objectiveFormula"
-              :options="mathjaxConfig"
-            ></vue-mathjax>
+            <vue-mathjax v-if="level > 1" :formula="objectiveFormula" :options="mathjaxConfig"></vue-mathjax>
             <div v-else>there is no objective, just play around!</div>
           </div>
         </div>
@@ -68,25 +64,14 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
-        <v-skeleton-loader
-          width="680"
-          height="120"
-          type="image"
-        ></v-skeleton-loader>
+        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader
-          class="plot"
-          width="480"
-          min-height="480"
-          type="image"
-        ></v-skeleton-loader>
+        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
       <v-card v-show="!loadingResults">
-        <v-card-title class="headline dark" primary-title
-          >Results for the level {{ level }}</v-card-title
-        >
+        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
 
         <v-card-text>
           <v-alert type="info">
@@ -96,22 +81,16 @@
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip
-            v-if="levelPassed && level != 1"
-            class="ma-2"
-            color="green"
-            text-color="white"
-          >
-            <v-avatar left> <v-icon>mdi-cake-variant</v-icon> </v-avatar>Well
+          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
+            <v-avatar left>
+              <v-icon>mdi-cake-variant</v-icon>
+            </v-avatar>Well
             done! Level passed with success!
           </v-chip>
-          <v-chip
-            v-if="!levelPassed"
-            class="ma-2"
-            color="red"
-            text-color="white"
-          >
-            <v-avatar left> <v-icon>mdi-close</v-icon> </v-avatar>You failed! :(
+          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
+            <v-avatar left>
+              <v-icon>mdi-close</v-icon>
+            </v-avatar>You failed! :(
             Try again
           </v-chip>
         </v-card-text>
@@ -120,16 +99,8 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false"
-            >Try out other circuits</v-btn
-          >
-          <v-btn
-            color="primary"
-            text
-            v-show="levelPassed"
-            @click="goToNextLevel()"
-            >Go to next level</v-btn
-          >
+          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
+          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -137,7 +108,7 @@
       You cannot put a multiple-registers gate on the last register
       <v-btn color="dark" text @click="snackbar = false">OK</v-btn>
     </v-snackbar>
-    <v-tour name="myTour" :steps="steps"></v-tour>
+    <v-tour name="myTour" :steps="tour.steps" :options="tour.options"></v-tour>
   </v-container>
 </template>
 
@@ -161,62 +132,79 @@ export default {
   },
   data: () => {
     return {
-      steps: [
-        {
-          target: "header", // We're using document.querySelector() under the hood
-          header: {
-            title: "Get Started"
+      tour: {
+        options: {
+          labels: {
+            buttonSkip: "Skip tour",
+            buttonPrevious: "Previous",
+            buttonNext: "Next",
+            buttonStop: "Got it!"
+          }
+        },
+        steps: [
+          {
+            target: "header",
+            header: {
+              title: "Welcome!"
+            },
+            content: `Welcome on the game page, here's a little tour to introduce the interface of <strong>Quantum Solace</strong> !`,
+            params: {
+              placement: "bottom",
+              highlight: false
+            }
           },
-          content: `Discover <strong>Vue Tour</strong>!`,
-          params: {
-            placement: "bottom",
-            highlight: false
-          }
-        },
-        {
-          target: "#objective", // We're using document.querySelector() under the hood
-          header: {
-            title: "Get Started"
+          {
+            target: "#objective",
+            header: {
+              title: "The quantum state"
+            },
+            content: `By making a <strong>Quantum Circuit</strong> you have to reach a certain state given here. <br/>Here, there is not objective, it's the level 1 !`,
+            params: {
+              placement: "right-start",
+              highlight: true
+            }
           },
-          content: `Discover <strong>Vue Tour</strong>!`,
-          params: {
-            placement: "right",
-            highlight: true
+          {
+            target: "#registers",
+            header: {
+              title: "The registers"
+            },
+            content:
+              "The registers are the things where you can place <strong>Quantum Gates</strong>. Each register has a state initialized at |0> and is the representation of one qubit.",
+            params: {
+              placement: "bottom-left",
+              highlight: true
+            }
+          },
+          {
+            target: "#clean-circuit-btn",
+            content:
+              "This button is used to clean every modifications you made on the current level. Be careful with this one!",
+            params: {
+              placement: "bottom",
+              highlight: true
+            }
+          },
+          {
+            target: "#submit-circuit-btn",
+            content:
+              "Submit your circuit to check if the circuit is good and execute it on a quantum processor!",
+            params: {
+              placement: "bottom",
+              highlight: true
+            }
+          },
+          {
+            target: ".gates-list",
+            content:
+              "You can find the <strong>Quantum Gates</strong> here. Drag and drop it to the registers to place it into the circuit.",
+            params: {
+              placement: "bottom",
+              highlight: true
+            }
           }
-        },
-        {
-          target: "#registers",
-          content: "An awesome plugin made with Vue.js!",
-          params: {
-            placement: "bottom",
-            highlight: true
-          }
-        },
-        {
-          target: "#clean-circuit-btn",
-          content: "An awesome plugin made with Vue.js!",
-          params: {
-            placement: "bottom",
-            highlight: true
-          }
-        },
-        {
-          target: "#submit-circuit-btn",
-          content: "An awesome plugin made with Vue.js!",
-          params: {
-            placement: "bottom",
-            highlight: true
-          }
-        },
-        {
-          target: ".gates-list",
-          content: "An awesome plugin made with Vue.js!",
-          params: {
-            placement: "bottom",
-            highlight: true
-          }
-        }
-      ],
+        ]
+      },
       gateToAdd: {
         name: "",
         id: -1
@@ -447,7 +435,7 @@ export default {
 .v-skeleton-loader {
   margin: 6px 0px;
 }
-#objective {
+.objective-level1 {
   width: 300px;
   padding: 10px;
 }
