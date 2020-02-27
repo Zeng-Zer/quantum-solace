@@ -143,7 +143,12 @@
       You cannot put a multiple-registers gate on the last register
       <v-btn color="dark" text @click="snackbar = false">OK</v-btn>
     </v-snackbar>
-    <v-tour name="myTour" :steps="tour.steps" :options="tour.options"></v-tour>
+    <v-tour
+      name="myTour"
+      :steps="tour.steps"
+      :options="tour.options"
+      :callbacks="tour.callbacks"
+    ></v-tour>
   </v-container>
 </template>
 
@@ -165,9 +170,12 @@ export default {
   props: {
     source: String
   },
-  data: () => {
+  data: function() {
     return {
       tour: {
+        callbacks: {
+          onStop: this.onStopTour
+        },
         options: {
           labels: {
             buttonSkip: "Skip tour",
@@ -287,6 +295,9 @@ export default {
     this.initLevel();
   },
   methods: {
+    onStopTour: function() {
+      localStorage.setItem("tour", true);
+    },
     initLevel: function(soft = false) {
       if (!soft) {
         this.objectiveFormula = "";
@@ -294,7 +305,10 @@ export default {
       }
       this.gatesList = [];
       if (this.level === 1) {
-        this.$tours["myTour"].start();
+        if (!localStorage.getItem("tour")) {
+          this.$tours["myTour"].start();
+        }
+        this.explanation = getExplanationLevelOne()[0];
         this.registerNumber = 1;
         this.title = "Bloch Sphere";
         this.registersList = Array(this.registerNumber).fill([]);
@@ -431,7 +445,7 @@ export default {
           if (this.level === 1) {
             this.levelPassed = true;
             this.loadingResults = false;
-            this.results.explanation = getExplanationLevelOne();
+            this.results.explanation = getExplanationLevelOne()[1];
           } else {
             api
               .checkCircuit({
