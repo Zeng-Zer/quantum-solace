@@ -25,8 +25,10 @@
     <v-footer app>
       <span>
         QuantumSolace &copy; 2019 - Made with
-        <v-icon>mdi-heart</v-icon>by
-        EPITECH students
+        <v-icon>mdi-heart</v-icon>&nbsp;by EPITECH students -
+        <a href="https://github.com/davidzeng8/quantum-solace">
+          <v-icon medium>fab fa-github</v-icon>
+        </a>
       </span>
     </v-footer>
   </v-app>
@@ -49,5 +51,8 @@ export default {
   height: 42px;
   width: 70%;
   background: #464646;
+}
+a {
+  text-decoration: none;
 }
 </style>

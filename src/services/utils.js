@@ -3,12 +3,17 @@ export function getRandomId() {
 }
 
 export function getExplanationLevelOne() {
-  return `
-    What you're seeing here is a bloch sphere. It's a representation of a qubit state in 3D. <br/>
+  return [
+    `
+    In quantum mechanics, the Bloch sphere is a geometrical representation of the pure state space of a two-level quantum mechanical system (qubit), named after the physicist Felix Bloch. <br/>Try to put any gate on the register !
+    `,
+    `
+    What you're seeing here is the Bloch sphere. It's a geometrical representation of the qubit state in 3D. <br/>
     A qubit state can be seen as a vector pointing at a
     sphere surface. Feel free to test differents gates to figure out what is happening ! <br/>
     Obviously, this is a "tutorial-level" there is no good or bad answer for it.
-  `;
+  `
+  ];
 }
 
 export function getGateDescriptionByName(gateName) {
