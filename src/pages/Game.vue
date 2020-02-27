@@ -5,10 +5,20 @@
     </v-btn>
     <v-row align="center" justify="center">
       <v-col class="col-12">
-        <div id="objective" :class="{'objective-level1': level == 1 }">
+        <div id="level-header">
+          <h1 class="d-flex justify-center">{{ title }}</h1>
+          <v-alert type="info">
+            <div v-html="explanation"></div>
+          </v-alert>
+        </div>
+        <div id="objective" :class="{ 'objective-level1': level == 1 }">
           <h2>Objective state:</h2>
           <div>
-            <vue-mathjax v-if="level > 1" :formula="objectiveFormula" :options="mathjaxConfig"></vue-mathjax>
+            <vue-mathjax
+              v-if="level > 1"
+              :formula="objectiveFormula"
+              :options="mathjaxConfig"
+            ></vue-mathjax>
             <div v-else>there is no objective, just play around!</div>
           </div>
         </div>
@@ -64,14 +74,25 @@
         width="800"
       >
         <v-skeleton-loader type="heading"></v-skeleton-loader>
-        <v-skeleton-loader width="680" height="120" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          width="680"
+          height="120"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader width="200" type="text"></v-skeleton-loader>
-        <v-skeleton-loader class="plot" width="480" min-height="480" type="image"></v-skeleton-loader>
+        <v-skeleton-loader
+          class="plot"
+          width="480"
+          min-height="480"
+          type="image"
+        ></v-skeleton-loader>
         <v-skeleton-loader type="chip"></v-skeleton-loader>
         <v-skeleton-loader type="actions"></v-skeleton-loader>
       </v-sheet>
       <v-card v-show="!loadingResults">
-        <v-card-title class="headline dark" primary-title>Results for the level {{ level }}</v-card-title>
+        <v-card-title class="headline dark" primary-title
+          >Results for the level {{ level }}</v-card-title
+        >
 
         <v-card-text>
           <v-alert type="info">
@@ -81,16 +102,22 @@
           <img :src="`data:image/jpeg;base64, ${results.img}`" />
           <br />
           <br />
-          <v-chip v-if="levelPassed && level != 1" class="ma-2" color="green" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-cake-variant</v-icon>
-            </v-avatar>Well
+          <v-chip
+            v-if="levelPassed && level != 1"
+            class="ma-2"
+            color="green"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-cake-variant</v-icon> </v-avatar>Well
             done! Level passed with success!
           </v-chip>
-          <v-chip v-if="!levelPassed" class="ma-2" color="red" text-color="white">
-            <v-avatar left>
-              <v-icon>mdi-close</v-icon>
-            </v-avatar>You failed! :(
+          <v-chip
+            v-if="!levelPassed"
+            class="ma-2"
+            color="red"
+            text-color="white"
+          >
+            <v-avatar left> <v-icon>mdi-close</v-icon> </v-avatar>You failed! :(
             Try again
           </v-chip>
         </v-card-text>
@@ -99,8 +126,16 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="dialog = false">Try out other circuits</v-btn>
-          <v-btn color="primary" text v-show="levelPassed" @click="goToNextLevel()">Go to next level</v-btn>
+          <v-btn color="primary" text @click="dialog = false"
+            >Try out other circuits</v-btn
+          >
+          <v-btn
+            color="primary"
+            text
+            v-show="levelPassed"
+            @click="goToNextLevel()"
+            >Go to next level</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -151,6 +186,16 @@ export default {
             params: {
               placement: "bottom",
               highlight: false
+            }
+          },
+          {
+            target: "h1",
+            header: {
+              title: "The level name"
+            },
+            content: `The title here is the level's name`,
+            params: {
+              placement: "bottom"
             }
           },
           {
@@ -216,6 +261,7 @@ export default {
           }
         }
       },
+      title: "",
       snackbar: false,
       loadingResults: true,
       levelPassed: false,
@@ -224,6 +270,7 @@ export default {
         bool: false,
         count: 0
       },
+      explanation: "",
       results: {
         img: null,
         count: null,
@@ -249,6 +296,7 @@ export default {
       if (this.level === 1) {
         this.$tours["myTour"].start();
         this.registerNumber = 1;
+        this.title = "Bloch Sphere";
         this.registersList = Array(this.registerNumber).fill([]);
         this.gatesList = [
           { name: "H", id: 1 },
@@ -262,6 +310,8 @@ export default {
           const goodCircuit = _.flatten(circuits[this.level - 2])[0];
           this.objectiveFormula = goodCircuit.formula;
           this.registerNumber = goodCircuit.registers.length;
+          this.title = goodCircuit.title;
+          this.explanation = goodCircuit.explanation[0];
           this.registersList = Array(this.registerNumber).fill([]);
           let id = 0;
           goodCircuit.registers.forEach((gatesList, i) => {
@@ -394,7 +444,7 @@ export default {
                 } else {
                   this.levelPassed = false;
                 }
-                this.results.explanation = res.data.explanation;
+                this.results.explanation = res.data.explanation[1];
                 this.dialog = true;
                 this.loadingResults = false;
               });
@@ -444,5 +494,11 @@ export default {
 }
 .v-tour__target--highlighted {
   box-shadow: 0 0 0 99999px rgba(255, 255, 255, 0.4) !important;
+}
+#level-header h1 {
+  margin-bottom: 20px;
+}
+#level-header {
+  margin-bottom: 110px;
 }
 </style>
