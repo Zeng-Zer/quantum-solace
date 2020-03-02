@@ -2,7 +2,7 @@
 
 ## Context
 
-We are students at Epitech and we've follow a course about Quantum IT. We had to do a project so we decided to mix our skills in classical IT and what we just learned in this course.
+We are students at Epitech and we've follow a course about Quantum computation. We had to do a project so we decided to mix our skills in classical IT and what we just learned in this course.
 
 ## Purpose
 
